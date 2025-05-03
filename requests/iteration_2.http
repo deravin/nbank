@@ -18,6 +18,10 @@ Authorization: Basic YWRtaW46YWRtaW4=
   "role": "USER"
 }
 
+
+
+###
+Прользователь может создавать один или несколько счетов
 ### Positove test: Autorized user can create an account,  "accountNumber": "ACC1"
 POST http://localhost:4111/api/v1/accounts
 Content-Type: application/json
@@ -28,16 +32,14 @@ POST http://localhost:4111/api/v1/accounts
 Content-Type: application/json
 Authorization: Basic QWxpY2U6QWxpY2UxMjMh
 
-### Autorized user can create several accounts,  "accountNumber": "ACC3"
-POST http://localhost:4111/api/v1/accounts
-Content-Type: application/json
-Authorization: Basic QWxpY2U6QWxpY2UxMjMh
-
+// Прользователь может посмотреть все свои счета
 ### Positove test: Autorized user can see all his accounts
 GET http://localhost:4111/api/v1/customer/accounts
 Content-Type: application/json
 Authorization: Basic QWxpY2U6QWxpY2UxMjMh
 
+
+// Прользователь может положить деньги на счет
 ### Positove test: Autorized user can deposit his account with id : 1
 POST http://localhost:4111/api/v1/accounts/deposit
 Content-Type: application/json
@@ -58,6 +60,19 @@ Authorization: Basic QWxpY2U6QWxpY2UxMjMh
   "balance": 1000
 }
 
+### Negative test: Autorized user cannot deposit account with incorrect sum
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+{
+  "id": 3,
+  "balance": -1000
+}
+
+
+###
+Прользователь может переводить деньги между своими счетами
 ### Positove test: Autorized user can transfer money from one account to another
 POST http://localhost:4111/api/v1/accounts/transfer
 Content-Type: application/json
@@ -69,18 +84,29 @@ Authorization: Basic QWxpY2U6QWxpY2UxMjMh
   "amount": 500
 }
 
-### Negative test: Autorized user cannot transfer money to not existed
+### Negative test: Autorized user cannot transfer money to not existed account
 POST http://localhost:4111/api/v1/accounts/transfer
 Content-Type: application/json
 Authorization: Basic QWxpY2U6QWxpY2UxMjMh
 
 {
   "senderAccountId": 1,
-  "receiverAccountId": 5,
+  "receiverAccountId": 15,
   "amount": 500
 }
 
-### Negative test: Autorized user cannot transfer money if it is not enough
+### Negative test: Autorized user cannot transfer money if account is the same
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+{
+  "senderAccountId": 3,
+  "receiverAccountId": 3,
+  "amount": 100
+}
+
+### Negative test: Autorized user cannot transfer money if amount is not enough
 POST http://localhost:4111/api/v1/accounts/transfer
 Content-Type: application/json
 Authorization: Basic QWxpY2U6QWxpY2UxMjMh
@@ -88,9 +114,22 @@ Authorization: Basic QWxpY2U6QWxpY2UxMjMh
 {
   "senderAccountId": 3,
   "receiverAccountId": 1,
-  "amount": 500
+  "amount": 50000
 }
 
+### Negative test: Autorized user cannot transfer incorrect sum
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": -100
+}
+
+###
+Пользователь может посмотреть историю транзакций
 ### Positove test: Autorized user can see transaction of his accounts
 GET http://localhost:4111/api/v1/accounts/2/transactions
 Content-Type: application/json
@@ -101,6 +140,8 @@ GET http://localhost:4111/api/v1/accounts/5/transactions
 Content-Type: application/json
 Authorization: Basic QWxpY2U6QWxpY2UxMjMh
 
+###
+Пользователь может изменить имя
 ### Positove test: Autorized user can change his name in his profile
 PUT http://localhost:4111/api/v1/customer/profile
 Content-Type: application/json
@@ -109,3 +150,46 @@ Authorization: Basic QWxpY2U6QWxpY2UxMjMh
 {
   "name": "New Name"
 }
+
+### Negative test: Autorized user can change his name in his profile with username contains $%^&*()@# characters
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+{
+  "username": "$%^&*()@#"
+}
+
+### Negative test: Autorized user can change his name in his profile with with username 2 or 16 characters
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+{
+  "username": "Al"
+}
+
+### Negative test: Autorized user can change his name in his profile with with username 2 or 16 characters
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+{
+  "username": "Alisdfdfdfdfdfdf"
+}
+
+### Negative test: Autorized user can change his name in his profile with with blank username
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+{
+  "username": "  "
+}
+
+###
+Пользователь может посмотреть свой профайл
+### Positove test: Autorized user can see his profile
+GET http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
