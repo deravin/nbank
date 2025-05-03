@@ -1,0 +1,116 @@
+### Login as admin and get auth Token: Authorization: Basic YWRtaW46YWRtaW4=
+POST http://localhost:4111/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+### Create new user(customer) for account testing with auth Token: Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Alice",
+  "password": "Alice123!",
+  "role": "USER"
+}
+
+
+
+### Positove test: Autorized user can create an account,  "accountNumber": "ACC1"
+POST http://localhost:4111/api/v1/accounts
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+### Positove test: Autorized user can create several accounts,  "accountNumber": "ACC2"
+POST http://localhost:4111/api/v1/accounts
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+### Autorized user can create several accounts,  "accountNumber": "ACC3"
+POST http://localhost:4111/api/v1/accounts
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+### Positove test: Autorized user can see all his accounts
+GET http://localhost:4111/api/v1/customer/accounts
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+### Positove test: Autorized user can deposit his account with id : 1
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+{
+  "id": 1,
+  "balance": 1000
+}
+
+### Negative test: Autorized user cannot deposit account that doesn't exist
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+{
+  "id": 4,
+  "balance": 1000
+}
+
+### Positove test: Autorized user can transfer money from one account to another
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 500
+}
+
+### Negative test: Autorized user cannot transfer money to not existed
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 5,
+  "amount": 500
+}
+
+### Negative test: Autorized user cannot transfer money if it is not enough
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+{
+  "senderAccountId": 3,
+  "receiverAccountId": 1,
+  "amount": 500
+}
+
+### Positove test: Autorized user can see transaction of his accounts
+GET http://localhost:4111/api/v1/accounts/2/transactions
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+### Negative test: Autorized user cannot see transaction of not his accounts
+GET http://localhost:4111/api/v1/accounts/5/transactions
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+### Positove test: Autorized user can change his name in his profile
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic QWxpY2U6QWxpY2UxMjMh
+
+{
+  "name": "New Name"
+}
+
+
+
