@@ -20,8 +20,6 @@ Authorization: Basic YWRtaW46YWRtaW4=
 
 
 
-###
-Прользователь может создавать один или несколько счетов
 ### Positove test: Autorized user can create an account,  "accountNumber": "ACC1"
 POST http://localhost:4111/api/v1/accounts
 Content-Type: application/json
@@ -39,7 +37,7 @@ Content-Type: application/json
 Authorization: Basic QWxpY2U6QWxpY2UxMjMh
 
 
-// Прользователь может положить деньги на счет
+// Прользователь может положить деньги на счет+++
 ### Positove test: Autorized user can deposit his account with id : 1
 POST http://localhost:4111/api/v1/accounts/deposit
 Content-Type: application/json
@@ -71,8 +69,8 @@ Authorization: Basic QWxpY2U6QWxpY2UxMjMh
 }
 
 
-###
-Прользователь может переводить деньги между своими счетами
+
+
 ### Positove test: Autorized user can transfer money from one account to another
 POST http://localhost:4111/api/v1/accounts/transfer
 Content-Type: application/json
@@ -128,8 +126,9 @@ Authorization: Basic QWxpY2U6QWxpY2UxMjMh
   "amount": -100
 }
 
-###
-Пользователь может посмотреть историю транзакций
+
+
+
 ### Positove test: Autorized user can see transaction of his accounts
 GET http://localhost:4111/api/v1/accounts/2/transactions
 Content-Type: application/json
@@ -140,8 +139,9 @@ GET http://localhost:4111/api/v1/accounts/5/transactions
 Content-Type: application/json
 Authorization: Basic QWxpY2U6QWxpY2UxMjMh
 
-###
-Пользователь может изменить имя
+
+
+
 ### Positove test: Autorized user can change his name in his profile
 PUT http://localhost:4111/api/v1/customer/profile
 Content-Type: application/json
@@ -187,8 +187,9 @@ Authorization: Basic QWxpY2U6QWxpY2UxMjMh
   "username": "  "
 }
 
-###
-Пользователь может посмотреть свой профайл
+
+
+
 ### Positove test: Autorized user can see his profile
 GET http://localhost:4111/api/v1/customer/profile
 Content-Type: application/json
