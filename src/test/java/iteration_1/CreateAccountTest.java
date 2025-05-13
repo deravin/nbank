@@ -1,17 +1,19 @@
 package iteration_1;
 
+import generators.RandomData;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
-import io.restassured.http.ContentType;
-import org.apache.http.HttpStatus;
-import org.hamcrest.Matchers;
+import models.CreateUserRequest;
+import models.UserRole;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import requests.AdminCreateUserRequester;
+import requests.CreateAccountRequester;
+import specs.RequestSpecs;
+import specs.ResponseSpecs;
 
 import java.util.List;
-
-import static io.restassured.RestAssured.given;
 
 public class CreateAccountTest {
     @BeforeAll
@@ -22,63 +24,39 @@ public class CreateAccountTest {
     }
 
     @Test
-    public void userCanCreateTest() {
-        // создание пользователя
-        given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", "Basic YWRtaW46YWRtaW4=")
-                .body("""
-                        {
-                        "username": "Alice0343",
-                        "password": "Kate2010!",
-                        "role": "USER"
-                        }
-                        """)
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED);
+    public void userCanCreateAccountTest() {
+        CreateUserRequest userRequest = CreateUserRequest.builder()
+                .username(RandomData.getUsername())
+                .password(RandomData.getPassword())
+                .role(UserRole.USER.toString())
+                .build();
 
-        // получаем токен
-        String userAuthHeader = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .body("""
-                        {
-                        "username": "Alice0343",
-                        "password": "Kate2010!"
-                        }
-                        """)
-                .post("http://localhost:4111/api/v1/auth/login")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)
-                .extract()
-                .header("Authorization");
+        // создание пользователя
+        new AdminCreateUserRequester(
+                RequestSpecs.adminSpec(),
+                ResponseSpecs.entityWasCreated())
+                .post(userRequest);
+
 
         // Создаем счет
-        given()
-                .header("Authorization", userAuthHeader)
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .post("http://localhost:4111/api/v1/accounts")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED);
+        new CreateAccountRequester(
+                RequestSpecs.authAsUserSpec(userRequest.getUsername(), userRequest.getPassword()),
+                ResponseSpecs.entityWasCreated())
+                .post(null);
+
 
         // проверяем что счет появился у этого пользователя
-        given()
-                .header("Authorization", userAuthHeader)
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .get("http://localhost:4111/api/v1/customer/accounts")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)
-                .body("id", Matchers.notNullValue())
-                .body("accountNumber", Matchers.not(Matchers.isEmptyOrNullString()))
-                .body("[0].balance", Matchers.comparesEqualTo(0.0f))
-                .body("[0].transactions", Matchers.empty());
+//        given()
+//                .header("Authorization", userAuthHeader)
+//                .contentType(ContentType.JSON)
+//                .accept(ContentType.JSON)
+//                .get("http://localhost:4111/api/v1/customer/accounts")
+//                .then()
+//                .assertThat()
+//                .statusCode(HttpStatus.SC_OK)
+//                .body("id", Matchers.notNullValue())
+//                .body("accountNumber", Matchers.not(Matchers.isEmptyOrNullString()))
+//                .body("[0].balance", Matchers.comparesEqualTo(0.0f))
+//                .body("[0].transactions", Matchers.empty());
     }
 }

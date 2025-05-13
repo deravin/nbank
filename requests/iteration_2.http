@@ -13,7 +13,7 @@ Content-Type: application/json
 Authorization: Basic YWRtaW46YWRtaW4=
 
 {
-  "username": "Alice",
+  "username": "Alice3",
   "password": "Alice123!",
   "role": "USER"
 }
@@ -151,7 +151,7 @@ Authorization: Basic QWxpY2U6QWxpY2UxMjMh
   "name": "New Name"
 }
 
-### Negative test: Autorized user can change his name in his profile with username contains $%^&*()@# characters
+### Negative test: Autorized user can not change his name in his profile with username contains $%^&*()@# characters
 PUT http://localhost:4111/api/v1/customer/profile
 Content-Type: application/json
 Authorization: Basic QWxpY2U6QWxpY2UxMjMh
