@@ -1,10 +1,13 @@
 package requests;
 
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import models.Account;
 import models.BaseModel;
+
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 
@@ -28,13 +31,14 @@ public class GetAccountRequester extends Request {
         return null;
     }
 
-    public Account getAccount() {
+    public List<Account> getAccounts() {
         return given()
                 .spec(requestSpecification)
-                .get("/api/v1/profile/")
+                .get("/api/v1/customer/accounts")
                 .then()
-                .statusCode(200)
+                .assertThat()
+                .spec(responseSpecification)
                 .extract()
-                .as(Account.class);
+                .as(new TypeRef<List<Account>>() {});
     }
 }

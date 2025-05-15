@@ -5,11 +5,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class AccountInfoResponse extends BaseModel{
-    private String accountNumber;
-    private float balance;
+    private int id;
+    private String username;
+    private String password;
+    private String name;
+    private String role;
+    private List<Account> accounts;
+
 }

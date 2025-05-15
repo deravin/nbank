@@ -13,5 +13,6 @@ public class Transaction extends BaseModel{
     private String id;
     private float amount;
     private String type;
-    private String relatedAccountID;
+    private int relatedAccountId;
+    private String timestamp;
 }

@@ -24,9 +24,8 @@ public class TransferMoneyRequester extends Request<TransferMoneyRequest> {
                 .body(model)
                 .post("/api/v1/accounts/transfer")
                 .then()
-                .spec(responseSpecification)
                 .assertThat()
-                .statusCode(HttpStatus.SC_OK);
+                .spec(responseSpecification);
     }
 
     @Override
