@@ -1,22 +1,17 @@
 package models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AccountInfoResponse extends BaseModel{
-    private int id;
-    private String username;
-    private String password;
-    private String name;
-    private String role;
-    private List<Account> accounts;
-
+public class AccountInfoResponse extends BaseModel {
+    private long id;
+    private String accountNumber;
+    private float balance;
+    private List<Transaction> transactions;
 }

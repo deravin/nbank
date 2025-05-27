@@ -1,6 +1,5 @@
 package models;
 
-import generators.GeneratingRule;
 import lombok.*;
 
 @EqualsAndHashCode(callSuper = true)
@@ -8,7 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AddDepositRequest extends BaseModel {
+public class DeleteUserRequest extends BaseModel{
     private long id;
-    private float balance;
 }

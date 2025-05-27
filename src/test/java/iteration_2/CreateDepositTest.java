@@ -1,60 +1,52 @@
 package iteration_2;
 
-import generators.RandomData;
-import models.Account;
+import iteration_1.BaseTest;
+import models.AccountInfoResponse;
 import models.AddDepositRequest;
 import models.CreateUserRequest;
-import models.UserRole;
+import models.CustomerAccountsList;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import requests.AddDepositRequester;
-import requests.AdminCreateUserRequester;
-import requests.CreateAccountRequester;
+import requests.skelethon.Endpoint;
+import requests.skelethon.requesters.CrudRequester;
+import requests.steps.AdminSteps;
+import requests.steps.UserSteps;
 import specs.RequestSpecs;
 import specs.ResponseSpecs;
 
 import java.util.stream.Stream;
 
-public class CreateDepositTest {
+public class CreateDepositTest extends BaseTest {
 
     // Позитивные кейсы
     // - число от 0 до 5000 - 4999
     // - 5000
     @ParameterizedTest
-    @ValueSource(floats = {4999,5000})
+    @ValueSource(floats = {4999, 5000})
     public void userCanAddDepositToHisAccount(float balance) {
-        // генерируем пользователя
-        CreateUserRequest userRequest = CreateUserRequest.builder()
-                .username(RandomData.getUsername())
-                .password(RandomData.getPassword())
-                .role(UserRole.USER.toString())
-                .build();
-
-        // передаем этого пользователя на сервер
-        new AdminCreateUserRequester(RequestSpecs.adminSpec(), // создаем спецификацию под админом
-                ResponseSpecs.entityWasCreated())
-                .post(userRequest);  // заводим нового пользователя - вызываем переопределенный post у объекта класса AdminCreateUserRequester
+        CreateUserRequest userRequest = AdminSteps.createUser();
 
         // Создаем счет
-        Account account = new CreateAccountRequester(
-                RequestSpecs.authAsUserSpec(userRequest.getUsername(), userRequest.getPassword()),
-                ResponseSpecs.entityWasCreated())
-                .postWithResponse(null);
+        AccountInfoResponse accountInfoResponse = UserSteps.createAccount(userRequest);
 
         // генерируем данные депозита
-        AddDepositRequest depositRequest = AddDepositRequest.builder()
-                .id(account.getId())
-                .balance(balance)
-                .build();
+        AddDepositRequest depositRequest = UserSteps.generateDepositSum(accountInfoResponse);
 
         // Кладем деньги на счет
-        new AddDepositRequester(
-                RequestSpecs.authAsUserSpec(userRequest.getUsername(), userRequest.getPassword()),
-                ResponseSpecs.requestReturnsOK())
-                .post(depositRequest);
+        UserSteps.addDeposit(depositRequest, userRequest, ResponseSpecs.requestReturnsOK());
+
+        // Получаем информацию про счета пользователя
+        CustomerAccountsList listOfAccounts = UserSteps.accountsList(userRequest);
+
+        // Обновляем account1
+        AccountInfoResponse accountInfoResponseUpdated = UserSteps.updateAccount(accountInfoResponse,listOfAccounts);
+
+        // Проверяем что деньги появились на счете
+        Assertions.assertEquals(balance, accountInfoResponseUpdated.getBalance(), 0.001, "Баланс после перевода не совпадает");
     }
 
     // Негативные тесты
@@ -70,33 +62,18 @@ public class CreateDepositTest {
     @ParameterizedTest
     @MethodSource("userInvalidData")
     public void userCanNotAddIncorrectDepositToHisAccount(float balance, String error) {
-        // генерируем пользователя
-        CreateUserRequest userRequest = CreateUserRequest.builder()
-                .username(RandomData.getUsername())
-                .password(RandomData.getPassword())
-                .role(UserRole.USER.toString())
-                .build();
-
-        // передаем этого пользователя на сервер
-        new AdminCreateUserRequester(RequestSpecs.adminSpec(), // создаем спецификацию под админом
-                ResponseSpecs.entityWasCreated())
-                .post(userRequest);  // заводим нового пользователя - вызываем переопределенный post у объекта класса AdminCreateUserRequester
+        CreateUserRequest userRequest = AdminSteps.createUser(); // заводим нового пользователя - вызываем переопределенный post у объекта класса AdminCreateUserRequester
 
         // Создаем счет
-        Account account = new CreateAccountRequester(
-                RequestSpecs.authAsUserSpec(userRequest.getUsername(), userRequest.getPassword()),
-                ResponseSpecs.entityWasCreated())
-                .postWithResponse(null);
+        AccountInfoResponse accountInfoResponse = UserSteps.createAccount(userRequest);
 
         // генерируем данные депозита
-        AddDepositRequest depositRequest = AddDepositRequest.builder()
-                .id(account.getId())
-                .balance(balance)
-                .build();
+        AddDepositRequest depositRequest = UserSteps.generateDepositSum(accountInfoResponse);
 
         // Кладем деньги на счет
-        new AddDepositRequester(
+        new CrudRequester(
                 RequestSpecs.authAsUserSpec(userRequest.getUsername(), userRequest.getPassword()),
+                Endpoint.DEPOSIT,
                 ResponseSpecs.requestReturnsBadRequestWithErrorInString(error))
                 .post(depositRequest);
     }
@@ -104,33 +81,21 @@ public class CreateDepositTest {
     // Негативный тест 2 - неверный аккаунт
     @Test
     public void userCanNotAddDepositToIncorrectAccount() {
-        // генерируем пользователя
-        CreateUserRequest userRequest = CreateUserRequest.builder()
-                .username(RandomData.getUsername())
-                .password(RandomData.getPassword())
-                .role(UserRole.USER.toString())
-                .build();
-
-        // передаем этого пользователя на сервер
-        new AdminCreateUserRequester(RequestSpecs.adminSpec(), // создаем спецификацию под админом
-                ResponseSpecs.entityWasCreated())
-                .post(userRequest);  // заводим нового пользователя - вызываем переопределенный post у объекта класса AdminCreateUserRequester
+        CreateUserRequest userRequest = AdminSteps.createUser();
 
         // Создаем счет
-        Account account = new CreateAccountRequester(
-                RequestSpecs.authAsUserSpec(userRequest.getUsername(), userRequest.getPassword()),
-                ResponseSpecs.entityWasCreated())
-                .postWithResponse(null);
+        AccountInfoResponse accountInfoResponse = UserSteps.createAccount(userRequest);
 
-        // генерируем данные депозита
+        // генерируем неверные данные депозита
         AddDepositRequest depositRequest = AddDepositRequest.builder()
-                .id(999999)
+                .id(accountInfoResponse.getId()+1)
                 .balance(1000)
                 .build();
 
         // Кладем деньги на счет
-        new AddDepositRequester(
+        new CrudRequester(
                 RequestSpecs.authAsUserSpec(userRequest.getUsername(), userRequest.getPassword()),
+                Endpoint.DEPOSIT,
                 ResponseSpecs.requestReturnsForbidden("Unauthorized access to account"))
                 .post(depositRequest);
     }
