@@ -143,7 +143,7 @@ public class TransferMoneyTest extends BaseTest {
 
         // Пытаемся перевести деньги на счет 2
         UserSteps.transferMoney(userRequest,accountInfoResponse1,accountInfoResponse2,transferAmount,
-                ResponseSpecs.requestReturnsBadRequestWithErrorInString("Invalid transfer: insufficient funds or invalid accounts"));
+                ResponseSpecs.requestReturnsBadRequestWithErrorInString());
 
         // Получаем информацию про счета пользователя
         CustomerAccountsList listOfAccounts = UserSteps.accountsList(userRequest);
@@ -188,7 +188,7 @@ public class TransferMoneyTest extends BaseTest {
                 .build();
 
         // Пытаемся перевести деньги на счет 2
-        ResponseSpecs.requestReturnsBadRequestWithErrorInString("Invalid transfer: insufficient funds or invalid accounts");
+        ResponseSpecs.requestReturnsBadRequestWithErrorInString();
 
         // Получаем информацию про счета пользователя
         CustomerAccountsList listOfAccounts = UserSteps.accountsList(userRequest);

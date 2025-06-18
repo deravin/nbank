@@ -39,7 +39,7 @@ public enum Endpoint {
     UPDATE_PROFILE(
             "/customer/profile",
             UpdateUserNameRequest.class,
-            CreateUserResponse.class),
+            UpdateUserNameResponse.class),
 
     GET_ACCOUNT("/customer/accounts",
             BaseModel.class,

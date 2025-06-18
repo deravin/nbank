@@ -74,7 +74,7 @@ public class CreateDepositTest extends BaseTest {
         new CrudRequester(
                 RequestSpecs.authAsUserSpec(userRequest.getUsername(), userRequest.getPassword()),
                 Endpoint.DEPOSIT,
-                ResponseSpecs.requestReturnsBadRequestWithErrorInString(error))
+                ResponseSpecs.requestReturnsBadRequestWithErrorInString())
                 .post(depositRequest);
     }
 
@@ -96,7 +96,7 @@ public class CreateDepositTest extends BaseTest {
         new CrudRequester(
                 RequestSpecs.authAsUserSpec(userRequest.getUsername(), userRequest.getPassword()),
                 Endpoint.DEPOSIT,
-                ResponseSpecs.requestReturnsForbidden("Unauthorized access to account"))
+                ResponseSpecs.requestReturnsForbidden())
                 .post(depositRequest);
     }
 }

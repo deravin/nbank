@@ -4,9 +4,11 @@ import generators.RandomModelGenerator;
 import iteration_1.BaseTest;
 import models.CreateUserRequest;
 import models.UpdateUserNameRequest;
+import models.UpdateUserNameResponse;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import requests.skelethon.Endpoint;
-import requests.skelethon.requesters.CrudRequester;
+import requests.skelethon.requesters.ValidatedCrudRequester;
 import requests.steps.AdminSteps;
 import specs.RequestSpecs;
 import specs.ResponseSpecs;
@@ -22,9 +24,18 @@ public class ChangeUserNameTest extends BaseTest {
                 RandomModelGenerator.generate(UpdateUserNameRequest.class);
 
         // логинимся и меняем имя
-        new CrudRequester(RequestSpecs.authAsUserSpec(userRequest.getUsername(), userRequest.getPassword()),
+        UpdateUserNameResponse updateUserNameResponse =
+        new ValidatedCrudRequester<UpdateUserNameResponse>(RequestSpecs.authAsUserSpec(userRequest.getUsername(), userRequest.getPassword()),
                 Endpoint.UPDATE_PROFILE,
                 ResponseSpecs.requestReturnsOK())
                 .put(updatedUserName);
+
+        // проверяем что имя изменилось
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(
+                        updatedUserName.getName(),
+                        updateUserNameResponse.getCustomer().getName(),
+                        "Имя должно соответствовать отправленному"
+                ));
     }
 }
