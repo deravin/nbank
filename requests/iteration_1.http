@@ -4,8 +4,8 @@ POST http://localhost:4111/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "username": "kate19981",
-  "password": "kate19981"
+  "username": "sdfsd4",
+  "password": "Frtgv%56g!"
 }
 
 ### Positive test: Admin can create new user with correct data
@@ -123,12 +123,12 @@ Authorization: Basic YWRtaW46YWRtaW4=
 }
 
 
-### Positive test: Authorized user can create account
-POST http://localhost:4111/api/v1/accounts
+### Positive test: Authorized user can create accountInfoResponse
+POST http://localhost:4111/api/v1/accountInfoRespons
 Content-Type: application/json
 Authorization: Basic a2F0ZTE5OTgxOmthdGUxOTk4MQ==
 
-### Positive test: check account was created
-GET http://localhost:4111/api/v1/customer/accounts
+### Positive test: check accountInfoResponse was created
+GET http://localhost:4111/api/v1/customer/accountInfoRespons
 Content-Type: application/json
 Authorization: Basic a2F0ZTE5OTgxOmthdGUxOTk4MQ==

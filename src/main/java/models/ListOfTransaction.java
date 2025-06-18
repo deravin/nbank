@@ -9,9 +9,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Account extends BaseModel {
-    private long id;
-    private String accountNumber;
-    private float balance;
+public class ListOfTransaction extends BaseModel{
     private List<Transaction> transactions;
 }

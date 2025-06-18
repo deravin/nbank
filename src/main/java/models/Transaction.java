@@ -1,10 +1,8 @@
 package models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,6 +11,6 @@ public class Transaction extends BaseModel{
     private String id;
     private float amount;
     private String type;
-    private int relatedAccountId;
     private String timestamp;
+    private int relatedAccountId;
 }

@@ -31,17 +31,17 @@ public class ResponseSpecs {
                 .build();
     }
 
-    public static ResponseSpecification requestReturnsBadRequestWithErrorInString(String error){
+    public static ResponseSpecification requestReturnsBadRequestWithErrorInString(){
         return defaultResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_BAD_REQUEST)
-                .expectBody(Matchers.equalTo(error))
+                .expectBody(Matchers.equalTo("Invalid transfer: insufficient funds or invalid accounts"))
                 .build();
     }
 
-    public static ResponseSpecification requestReturnsForbidden(String error){
+    public static ResponseSpecification requestReturnsForbidden(){
         return defaultResponseSpecBuilder()
                 .expectStatusCode(HttpStatus.SC_FORBIDDEN)
-                .expectBody(Matchers.equalTo(error))
+                .expectBody(Matchers.equalTo("Unauthorized access to account"))
                 .build();
     }
 
