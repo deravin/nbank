@@ -1,0 +1,270 @@
+### Create new user(customer) for testing with auth Token: Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Alice229",
+  "password": "Alice123!",
+  "role": "USER"
+}
+
+> {%
+    client.assert(response.status === 201, "Ожидался статус 201 Created");
+    client.assert(response.body.username === "Alice229", "Имя пользователя не совпадает");
+    client.assert(response.body.role === "USER", "Роль должна быть USER");
+%}
+
+### Positive test: Authorized user (Basic QWxpY2UyMjk6QWxpY2UxMjMh) can create an account,  "accountNumber": "ACC1"
+POST http://localhost:4111/api/v1/accounts
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+> {%
+    client.assert(response.status === 201, "Ожидался статус 201 Created");
+    client.assert(response.body.id === 1, "id аккаунта не совпадает");
+    client.assert(response.body.accountNumber === "ACC1", "Номер аккаунта не совпадает");
+
+%}
+
+### Positive test: Authorized user (Basic QWxpY2UyMjk6QWxpY2UxMjMh) can create several accounts,  "accountNumber": "ACC2"
+POST http://localhost:4111/api/v1/accounts
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+> {%
+    client.assert(response.status === 201, "Ожидался статус 201 Created");
+    client.assert(response.body.id === 2, "id аккаунта не совпадает");
+    client.assert(response.body.accountNumber === "ACC2", "Номер аккаунта не совпадает");
+%}
+
+
+### Прользователь может посмотреть все свои счета
+### Positive test: Authorized user can see all his accounts
+GET http://localhost:4111/api/v1/customer/accounts
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+
+### Пользователь может положить деньги на счет
+### Positive test: Authorized user can deposit his account with id : 1
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+{
+  "id": 1,
+  "balance": 1000
+}
+
+> {%
+    client.test("Проверка тела ответа на accountInfo", function() {
+        client.assert(response.status === 200, "Ожидался статус 200 OK");
+        const body = response.body;
+        client.assert(body.id === 1, "ID аккаунта должен быть 1");
+        client.assert(body.accountNumber === "ACC1", "Неверный номер аккаунта");
+        client.assert(body.balance === 1000.0, "Неверный баланс");
+        client.assert(Array.isArray(body.transactions), "");
+        client.assert(body.transactions.length === 1, "Ожидается одна транзакция");
+        const transaction = body.transactions[0];
+        client.assert(transaction.amount === 1000.0, "Неверная сумма транзакции");
+        client.assert(transaction.type === "DEPOSIT", "Тип транзакции должен быть DEPOSIT");
+        client.assert(transaction.relatedAccountId === 1, "relatedAccountId должен быть 1");
+    });
+%}
+
+### Negative test: Authorized user cannot deposit account that doesn't exist
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+{
+  "id": 4,
+  "balance": 1000
+}
+
+> {%
+    client.assert(response.status === 403, "Ожидался статус 403 Unauthorized access to account");
+%}
+
+### Negative test: Authorized user cannot deposit account with incorrect sum
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+{
+  "id": 1,
+  "balance": -1000
+}
+
+> {%
+    client.assert(response.status === 400, "Ожидался статус 400 Invalid account or amount");
+%}
+
+### Пользователь может перевести деньги на другой счет
+### Positive test: Authorized user can transfer money from one account to another
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 500
+}
+
+> {%
+        client.assert(response.status === 200, "Ожидался статус 200 OK");
+        const body = response.body;
+        client.assert(body.senderAccountId === 1, "ID аккаунта отправителя должен быть 1");
+        client.assert(body.receiverAccountId === 2, "ID аккаунта получателя должен быть 2");
+        client.assert(body.amount === 500, "ID аккаунта получателя должен быть 2");
+        client.assert(body.message === "Transfer successful", "ID аккаунта получателя должен быть 2");
+%}
+
+### Negative test: Authorized user cannot transfer money to not existed account
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 15,
+  "amount": 500
+}
+
+> {%
+    client.assert(response.status === 400, "Ожидался статус 400 Invalid account or amount");
+%}
+
+### Negative test: Authorized user cannot transfer money if account is the same
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 1,
+  "amount": 100
+}
+
+> {%
+    client.assert(response.status === 400, "Ожидался статус 400 Invalid account or amount");
+%}
+
+### Negative test: Authorized user cannot transfer money if amount is not enough
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 50000
+}
+
+> {%
+    client.assert(response.status === 400, "Ожидался статус 400 invalid transfer: insufficient funds or invalid accounts");
+%}
+
+
+### Negative test: Authorized user cannot transfer incorrect sum
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": -100
+}
+
+> {%
+    client.assert(response.status === 400, "Ожидался статус 400 Invalid transfer: insufficient funds or invalid accounts");
+%}
+
+
+### Пользователь может видеть список своих транзакций
+### Positive test: Authorized user can see transaction of his accounts
+GET http://localhost:4111/api/v1/accounts/1/transactions
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+> {%
+    client.test("Проверка тела ответа на список транзакций", function() {
+        client.assert(response.status === 200, "Ожидался статус 200 OK");
+        // Проверяем, что тело ответа является массивом
+        client.assert(Array.isArray(response.body), "Тело ответа должно быть массивом");
+        // Проверяем количество элементов в массиве
+        client.assert(response.body.length === 4, "Ожидалось 4 транзакции");
+
+        // Находим транзакцию DEPOSIT (может быть не первой в списке)
+        const depositTransaction = response.body.find(t => t.type === "DEPOSIT");
+        client.assert(depositTransaction, "Не найдена транзакция DEPOSIT");
+        client.assert(depositTransaction.amount === 1000.0, "Неверная сумма транзакции DEPOSIT");
+        client.assert(depositTransaction.relatedAccountId === 1, "relatedAccountId для DEPOSIT должен быть 1");
+
+        // Проверяем первую TRANSFER_OUT транзакцию
+        const transferOutTransaction = response.body.find(t => t.type === "TRANSFER_OUT" && t.amount === 500.0);
+        client.assert(transferOutTransaction, "Не найдена TRANSFER_OUT транзакция с amount=500.0");
+        client.assert(transferOutTransaction.relatedAccountId === 2, "relatedAccountId для TRANSFER_OUT должен быть 2");
+
+        // Проверяем TRANSFER_IN транзакцию
+        const transferInTransaction = response.body.find(t => t.type === "TRANSFER_IN");
+        client.assert(transferInTransaction, "Не найдена TRANSFER_IN транзакция");
+        client.assert(transferInTransaction.amount === 100.0, "Неверная сумма TRANSFER_IN транзакции");
+    });
+%}
+
+
+### Create new user(customer) for testing negative tests: Authorization: Basic QWxpY2UzNzpBbGljZTEyMyE=
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "Alice37",
+  "password": "Alice123!",
+  "role": "USER"
+}
+
+### Create account for new user
+POST http://localhost:4111/api/v1/accounts
+Content-Type: application/json
+Authorization: Basic QWxpY2UzNzpBbGljZTEyMyE=
+
+### Negative test: Authorized user cannot see transaction of not his accounts
+GET http://localhost:4111/api/v1/accounts/3/transactions
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+> {%
+    client.assert(response.status === 403, "Ожидался статус 403 You do not have permission to access this account");
+%}
+
+### Пользователь может изменять имя профиля
+### Positive test: Authorized user can change his name in his profile
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+{
+  "name": "New Name"
+}
+
+> {%
+    client.assert(response.status === 200, "Ожидался статус 200 Created");
+    client.assert(response.body.id === 1, "id аккаунта не совпадает");
+    client.assert(response.body.name === "New Name", "Номер аккаунта не совпадает");
+%}
+
+
+### Positive test: Authorized user can see his profile
+GET http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic QWxpY2UyMjk6QWxpY2UxMjMh
+
+> {%
+client.assert(response.status === 200, "Ожидался статус 200 Created");
+client.assert(response.body.id === 1, "id аккаунта не совпадает");
+%}
