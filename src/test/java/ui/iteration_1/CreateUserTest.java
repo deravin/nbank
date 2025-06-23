@@ -1,4 +1,4 @@
-package ui;
+package ui.iteration_1;
 
 import api.generators.RandomModelGenerator;
 import api.models.CreateUserRequest;
@@ -13,7 +13,6 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.util.Arrays;
-import java.util.Map;
 
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.switchTo;
@@ -59,7 +58,7 @@ public class CreateUserTest {
         // ШАГ 3: проверка, что алерт "✅ User created successfully!"
         Alert alert = switchTo().alert();
 
-        assertEquals(alert.getText(), "✅ User created successfully!");
+        assertEquals( "✅ User created successfully!", alert.getText());
 
         alert.accept();
 
