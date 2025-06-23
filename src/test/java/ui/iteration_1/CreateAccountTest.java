@@ -1,4 +1,4 @@
-package ui;
+package ui.iteration_1;
 
 import api.models.AccountInfoResponse;
 import api.models.CreateUserRequest;
@@ -14,8 +14,8 @@ import com.codeborne.selenide.Selenide;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
-import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,15 +26,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CreateAccountTest {
     @BeforeAll
     public static void setUp() {
+//        Configuration.browser = "chrome";
+//        Configuration.browserSize = "1920x1080";
+//        Configuration.headless = false;
+//        Configuration.baseUrl = "http://localhost:3000";
+//        Configuration.timeout = 10000; // На всякий случай
+//
+//        ChromeOptions chromeOptions = new ChromeOptions();
+//        chromeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu");
+//        Configuration.browserCapabilities = chromeOptions;
+
+        Configuration.remote = "http://localhost:4444/wd/hub";
+        Configuration.baseUrl = "http://10.0.0.104:3000";
         Configuration.browser = "chrome";
         Configuration.browserSize = "1920x1080";
-        Configuration.headless = false;
-        Configuration.baseUrl = "http://localhost:3000";
-        Configuration.timeout = 10000; // На всякий случай
 
-        ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu");
-        Configuration.browserCapabilities = chromeOptions;
+        Configuration.browserCapabilities.setCapability("selenoid:options",
+                Map.of("enableVNC", true, "enableLog", true)
+        );
+
     }
 
     @Test
@@ -58,7 +68,7 @@ public class CreateAccountTest {
 
         Selenide.open("/");
 
-        executeJavaScript("localStorage.setItem('authToken', arguments[0]);", userAuthHeader)
+        executeJavaScript("localStorage.setItem('authToken', arguments[0]);", userAuthHeader);
 
         Selenide.open("/dashboard");
 
@@ -80,8 +90,6 @@ public class CreateAccountTest {
         Matcher matcher = pattern.matcher(alertText);
 
         matcher.find();
-
-        String createdAccNumber = matcher.group(1);
 
         // ШАГ 6: проверка, что аккаунт создался на API
 

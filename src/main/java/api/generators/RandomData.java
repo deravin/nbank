@@ -1,8 +1,8 @@
 package api.generators;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 
+import java.text.DecimalFormat;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomData {
@@ -18,8 +18,15 @@ public class RandomData {
                 RandomStringUtils.randomNumeric(3) + "&!*-";
     }
 
-    public static float getBalance(){
-        return ThreadLocalRandom.current().nextFloat()*1000;
+//    public static float getBalance(){
+//        return ThreadLocalRandom.current().nextFloat()*1000;
+//    }
+
+    public static float getBalance() {
+        // Генерируем значение от 100.01 до 1100
+        float randomValue = 100.01f + ThreadLocalRandom.current().nextFloat() * 1100;
+        DecimalFormat df = new DecimalFormat("#.##");
+        return Float.parseFloat(df.format(randomValue));
     }
 
 }
