@@ -39,6 +39,13 @@ public class RequestSpecs {
     }
 
     public static RequestSpecification authAsUserSpec(String username, String password){
+         return defaultRequestBuilder()
+                 .addHeader("Authorization", getUserAuthHeader(username,password))
+                 .build();
+
+    }
+
+    public static String getUserAuthHeader(String username, String password){
         String userAuthHeader;
         if (!authHeaders.containsKey(username)) {
             userAuthHeader = new CrudRequester(
@@ -52,8 +59,6 @@ public class RequestSpecs {
         } else {
             userAuthHeader = authHeaders.get(username);
         }
-            return defaultRequestBuilder().addHeader("Authorization", userAuthHeader)
-                    .build();
-
+        return userAuthHeader;
     }
 }
