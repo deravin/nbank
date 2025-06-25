@@ -27,7 +27,7 @@ public class BaseUiTest extends BaseTest {
         // Нерабочий конфиг из-за селеноида
 //        Configuration.remote = Config.getProperties("ui.remote");
 //        Configuration.baseUrl = Config.getProperties("ui.base.url");
-//
+
 //        Configuration.browserCapabilities.setCapability("selenoid:options",
 //                Map.of("enableVNC", true, "enableLog", true)
 //        );

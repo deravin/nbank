@@ -4,11 +4,14 @@ import com.codeborne.selenide.Selectors;
 import com.codeborne.selenide.SelenideElement;
 import lombok.Getter;
 
+import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 @Getter
 public class UserDashboard extends BasePage<UserDashboard>{
     private SelenideElement welcomeText =  $(Selectors.byClassName("welcome-text"));
-    private SelenideElement createNewAccount = $(Selectors.byText("➕ Create New Account"));
+    private SelenideElement createNewAccount = $(byText("➕ Create New Account"));
+    private SelenideElement makeTransfrButton = $(byText("\uD83D\uDD04 Make a Transfer"));
+    private SelenideElement makeDepositButton = $(byText("💰 Deposit Money"));
 
     @Override
     public String url() {
@@ -17,6 +20,16 @@ public class UserDashboard extends BasePage<UserDashboard>{
 
     public UserDashboard createNewAccount(){
         createNewAccount.click();
+        return this;
+    }
+
+    public UserDashboard makeTransfer(){
+        makeTransfrButton.click();
+        return this;
+    }
+
+    public UserDashboard makeDeposit(){
+        makeDepositButton.click();
         return this;
     }
 }

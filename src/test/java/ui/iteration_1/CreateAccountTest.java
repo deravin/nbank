@@ -24,7 +24,8 @@ public class CreateAccountTest extends BaseUiTest {
 
         // ШАГИ ТЕСТА
         // ШАГ 4: Юзер создает аккаунт
-        new UserDashboard().open().createNewAccount();
+        new UserDashboard().open()
+                .createNewAccount();
 
         // ШАГ 5: проверка, что аккаунт создался на API
         AccountInfoResponse createdAccount = UserSteps.accountsList(user).getAccounts().getFirst();
