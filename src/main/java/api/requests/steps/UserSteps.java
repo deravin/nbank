@@ -9,6 +9,8 @@ import api.specs.RequestSpecs;
 import api.specs.ResponseSpecs;
 import io.restassured.specification.ResponseSpecification;
 
+import java.util.List;
+
 public class UserSteps {
     public static AccountInfoResponse createAccount(CreateUserRequest userRequest) {
         AccountInfoResponse accountInfoResponse = new ValidatedCrudRequester<AccountInfoResponse>(
@@ -81,4 +83,27 @@ public class UserSteps {
         } while (transferAmount <= 1.00f); // Минимальная сумма = 1.00
         return transferAmount;
     }
+
+    public static UpdateUserNameResponse updateUserName(CreateUserRequest user, UpdateUserNameRequest updatedUserName){
+        return new ValidatedCrudRequester<UpdateUserNameResponse>(RequestSpecs.authAsUserSpec(user.getUsername(), user.getPassword()),
+                Endpoint.UPDATE_PROFILE,
+                ResponseSpecs.requestReturnsOK())
+                .put(updatedUserName);
+    }
+
+    public static CreateUserResponse getUserProfile(CreateUserRequest user) {
+        return new ValidatedCrudRequester<CreateUserResponse>( // <- Исправлено
+                RequestSpecs.authAsUserSpec(user.getUsername(), user.getPassword()),
+                Endpoint.PROFILE,
+                ResponseSpecs.requestReturnsOK())
+                .get();
+    }
+
+    public static AccountInfoResponse getAccountIDFromList(List<AccountInfoResponse> existingUserAccounts, AccountInfoResponse account){
+        return existingUserAccounts.stream()
+                .filter(a -> a.getId() == account.getId())
+                .findFirst()
+                .orElseThrow();
+    }
+
 }
