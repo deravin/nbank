@@ -1,3 +1,4 @@
+/* Лицензия */
 package ui.iteration_2;
 
 import api.generators.RandomModelGenerator;
@@ -6,7 +7,6 @@ import api.models.CreateUserResponse;
 import api.models.UpdateUserNameRequest;
 import api.requests.steps.AdminSteps;
 import api.requests.steps.UserSteps;
-import com.codeborne.selenide.Selenide;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ui.BaseUiTest;
@@ -17,16 +17,19 @@ import ui.pages.UserDashboard;
 public class ChangeNameTest extends BaseUiTest {
     // Позитивный тест 1
     @Test
-    public void userCanChangeName(){
+    public void userCanChangeName() {
         // ШАГ 1: Админ создает юзера
         CreateUserRequest user = AdminSteps.createUser();
         // ШАГ 2: Юзер логинится в банке
         authAsUser(user);
         // ШАГ 3: Юзер меняет имя
         // генерируем имя и вводим его в UI
-        UpdateUserNameRequest updatedUserName = RandomModelGenerator.generate(UpdateUserNameRequest.class);
-        new EditProfilePage().open().changeName(updatedUserName.getName())
-        // ШАГ 4: Проверяем алерт
+        UpdateUserNameRequest updatedUserName =
+                RandomModelGenerator.generate(UpdateUserNameRequest.class);
+        new EditProfilePage()
+                .open()
+                .changeName(updatedUserName.getName())
+                // ШАГ 4: Проверяем алерт
                 .checkedAlertMessageAndAccept(BankAlerts.NAME_UPDATED_SUCCESSFULLY.getMessage());
 
         // Проверяем что имя поменялось в API
@@ -37,10 +40,10 @@ public class ChangeNameTest extends BaseUiTest {
         new UserDashboard().open().checkName(updateUserNameResponse);
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(
-                        updatedUserName.getName(),
-                        updateUserNameResponse,
-                        "Имя должно соответствовать отправленному"
-                ));
+                () ->
+                        Assertions.assertEquals(
+                                updatedUserName.getName(),
+                                updateUserNameResponse,
+                                "Имя должно соответствовать отправленному"));
     }
 }
