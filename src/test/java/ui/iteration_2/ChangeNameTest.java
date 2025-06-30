@@ -6,11 +6,13 @@ import api.models.CreateUserResponse;
 import api.models.UpdateUserNameRequest;
 import api.requests.steps.AdminSteps;
 import api.requests.steps.UserSteps;
+import com.codeborne.selenide.Selenide;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ui.BaseUiTest;
 import ui.alerts.BankAlerts;
 import ui.pages.EditProfilePage;
+import ui.pages.UserDashboard;
 
 public class ChangeNameTest extends BaseUiTest {
     // Позитивный тест 1
@@ -26,9 +28,14 @@ public class ChangeNameTest extends BaseUiTest {
         new EditProfilePage().open().changeName(updatedUserName.getName())
         // ШАГ 4: Проверяем алерт
                 .checkedAlertMessageAndAccept(BankAlerts.NAME_UPDATED_SUCCESSFULLY.getMessage());
+
         // Проверяем что имя поменялось в API
         CreateUserResponse response = UserSteps.getUserProfile(user);
         String updateUserNameResponse = response.getName();
+
+        // Проверка, что имя поменялось ан UI
+        new UserDashboard().open().checkName(updateUserNameResponse);
+
         Assertions.assertAll(
                 () -> Assertions.assertEquals(
                         updatedUserName.getName(),
