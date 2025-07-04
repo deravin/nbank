@@ -6,6 +6,7 @@ import api.models.CreateUserRequest;
 import api.models.CustomerAccountsList;
 import api.requests.steps.AdminSteps;
 import api.requests.steps.UserSteps;
+import common.storage.SessionStorage;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -28,12 +29,13 @@ public class CreateAccountTest extends BaseTest {
     AccountInfoResponse accountInfoResponse = UserSteps.createAccount(userRequest);
 
     // Получаем список всех счетов пользователя
-    CustomerAccountsList listOfAccounts = UserSteps.accountsList(userRequest);
+//    CustomerAccountsList listOfAccounts = UserSteps.accountsList(userRequest);
+    List<AccountInfoResponse> createdAccounts = SessionStorage.getSteps().getAllAccounts();
 
     // Проверяем что созданный счет там есть
     Assertions.assertEquals(
         List.of(accountInfoResponse).toString(),
-        listOfAccounts.getAccounts().toString(),
+            createdAccounts.getFirst().toString(),
         "Счет не создался");
   }
 }

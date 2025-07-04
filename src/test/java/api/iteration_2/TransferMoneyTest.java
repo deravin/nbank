@@ -42,7 +42,8 @@ public class TransferMoneyTest extends BaseTest {
         ResponseSpecs.requestReturnsOK());
 
     // Получаем информацию про счета пользователя
-    CustomerAccountsList listOfAccounts = UserSteps.accountsList(userRequest);
+    UserSteps userSteps = new UserSteps(userRequest.getUsername(),userRequest.getPassword());
+    CustomerAccountsList listOfAccounts = UserSteps.accountsList(userSteps);
 
     // Обновляем account1 и account2
     AccountInfoResponse accountInfoResponse1Updated =
@@ -99,7 +100,8 @@ public class TransferMoneyTest extends BaseTest {
         ResponseSpecs.requestReturnsOK());
 
     // Получаем информацию про счета пользователя
-    CustomerAccountsList listOfAccounts = UserSteps.accountsList(userRequest);
+    UserSteps userSteps = new UserSteps(userRequest.getUsername(), userRequest.getPassword());
+    CustomerAccountsList listOfAccounts = UserSteps.accountsList(userSteps);
 
     // Обновляем account1
     AccountInfoResponse accountInfoResponse1Updated =
@@ -147,7 +149,8 @@ public class TransferMoneyTest extends BaseTest {
         ResponseSpecs.requestReturnsOK());
 
     // Получаем информацию про счета пользователя
-    CustomerAccountsList listOfAccounts = UserSteps.accountsList(userRequest);
+    UserSteps userSteps = new UserSteps(userRequest.getUsername(), userRequest.getPassword());
+    CustomerAccountsList listOfAccounts = UserSteps.accountsList(userSteps);
 
     // Обновляем account1
     AccountInfoResponse accountInfoResponse1Updated =
@@ -190,7 +193,8 @@ public class TransferMoneyTest extends BaseTest {
         ResponseSpecs.requestReturnsBadRequestWithErrorInString());
 
     // Получаем информацию про счета пользователя
-    CustomerAccountsList listOfAccounts = UserSteps.accountsList(userRequest);
+    UserSteps userSteps = new UserSteps(userRequest.getUsername(), userRequest.getPassword());
+    CustomerAccountsList listOfAccounts = UserSteps.accountsList(userSteps);
 
     // Обновляем account1
     AccountInfoResponse accountInfoResponse1Updated =
@@ -247,7 +251,8 @@ public class TransferMoneyTest extends BaseTest {
     ResponseSpecs.requestReturnsBadRequestWithErrorInString();
 
     // Получаем информацию про счета пользователя
-    CustomerAccountsList listOfAccounts = UserSteps.accountsList(userRequest);
+    UserSteps userSteps = new UserSteps(userRequest.getUsername(), userRequest.getPassword());
+    CustomerAccountsList listOfAccounts = UserSteps.accountsList(userSteps);
 
     // Обновляем account1
     AccountInfoResponse accountInfoResponse1Updated =

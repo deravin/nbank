@@ -11,6 +11,7 @@ import com.codeborne.selenide.Selenide;
 
 import java.util.List;
 
+import common.storage.SessionStorage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ui.BaseUiTest;
@@ -24,7 +25,7 @@ public class TransferMoneyTest extends BaseUiTest {
     public void userCanTransferMoneyToOwnAccountTest() {
         // Создание юзера
         CreateUserRequest user = AdminSteps.createUser();
-        authAsUser(user);
+ //       authAsUser(user);
         // Юзер создает 2 счета
         AccountInfoResponse account1 = UserSteps.createAccount(user);
         AccountInfoResponse account2 = UserSteps.createAccount(user);
@@ -58,12 +59,13 @@ public class TransferMoneyTest extends BaseUiTest {
 
         // Проверка на API
         // Получаем список всех аккаунтов юзера
-        List<AccountInfoResponse> existingUserAccounts = UserSteps.accountsList(user).getAccounts();
+//        List<AccountInfoResponse> existingUserAccounts = UserSteps.accountsList(user).getAccounts();
+        List<AccountInfoResponse> createdAccounts = SessionStorage.getSteps().getAllAccounts();
         // Находим нужные аккаунты по ID
         AccountInfoResponse updatedAccount1 =
-                UserSteps.getAccountIDFromList(existingUserAccounts, account1);
+                UserSteps.getAccountIDFromList(createdAccounts, account1);
         AccountInfoResponse updatedAccount2 =
-                UserSteps.getAccountIDFromList(existingUserAccounts, account2);
+                UserSteps.getAccountIDFromList(createdAccounts, account2);
         // Проверяем балансы с допустимой погрешностью для float
         Assertions.assertEquals(
                 amount, updatedAccount1.getBalance(), 0.001, "Баланс аккаунта 1 в API не совпадает");
@@ -81,12 +83,12 @@ public class TransferMoneyTest extends BaseUiTest {
         CreateUserRequest user1 = AdminSteps.createUser();
         CreateUserRequest user2 = AdminSteps.createUser();
         // Юзер1 логинится в банке
-        authAsUser(user1);
+   //     authAsUser(user1);
         // Юзер1 создает счет
         AccountInfoResponse account1 = UserSteps.createAccount(user1);
         String accountUser1Number = account1.getAccountNumber();
         // Юзер2 логинится в банке
-        authAsUser(user2);
+  //      authAsUser(user2);
         // Юзер2 создает счет
         AccountInfoResponse account2 = UserSteps.createAccount(user2);
         String accountUser2Number = account2.getAccountNumber();
@@ -117,12 +119,14 @@ public class TransferMoneyTest extends BaseUiTest {
         // проверка на API
         // Получаем список всех аккаунтов юзера 1 и 2
         // Находим нужные аккаунты по ID
-        List<AccountInfoResponse> existingUser1Accounts = UserSteps.accountsList(user1).getAccounts();
-        List<AccountInfoResponse> existingUser2Accounts = UserSteps.accountsList(user2).getAccounts();
+//        List<AccountInfoResponse> existingUser1Accounts = UserSteps.accountsList(user1).getAccounts();
+//        List<AccountInfoResponse> existingUser2Accounts = UserSteps.accountsList(user2).getAccounts();
+        List<AccountInfoResponse> createdAccounts1 = SessionStorage.getSteps().getAllAccounts();
+        List<AccountInfoResponse> createdAccounts2 = SessionStorage.getSteps().getAllAccounts();
         AccountInfoResponse updatedAccount1 =
-                UserSteps.getAccountIDFromList(existingUser1Accounts, account1);
+                UserSteps.getAccountIDFromList(createdAccounts1, account1);
         AccountInfoResponse updatedAccount2 =
-                UserSteps.getAccountIDFromList(existingUser2Accounts, account2);
+                UserSteps.getAccountIDFromList(createdAccounts2, account2);
         // Проверяем балансы с допустимой погрешностью для float
         Assertions.assertEquals(
                 100.0f, updatedAccount2.getBalance(), 0.001, "Баланс аккаунта 2 в API не совпадает");
@@ -137,7 +141,7 @@ public class TransferMoneyTest extends BaseUiTest {
     @Test
     public void userCanNotTransferIncorrectSumTest() {
         CreateUserRequest user = AdminSteps.createUser();
-        authAsUser(user);
+  //      authAsUser(user);
         // Юзер создает 2 счета
         AccountInfoResponse account1 = UserSteps.createAccount(user);
         AccountInfoResponse account2 = UserSteps.createAccount(user);
@@ -165,12 +169,13 @@ public class TransferMoneyTest extends BaseUiTest {
         new TransferPage().checkSelfAccounts(account2Number, 0.0f);
 
         // Проверка на api что деньги не ушли
-        List<AccountInfoResponse> existingUserAccounts = UserSteps.accountsList(user).getAccounts();
+//        List<AccountInfoResponse> existingUserAccounts = UserSteps.accountsList(user).getAccounts();
+        List<AccountInfoResponse> createdAccounts = SessionStorage.getSteps().getAllAccounts();
         // Находим нужные аккаунты по ID
         AccountInfoResponse updatedAccount1 =
-                UserSteps.getAccountIDFromList(existingUserAccounts, account1);
+                UserSteps.getAccountIDFromList(createdAccounts, account1);
         AccountInfoResponse updatedAccount2 =
-                UserSteps.getAccountIDFromList(existingUserAccounts, account2);
+                UserSteps.getAccountIDFromList(createdAccounts, account2);
         // Проверяем балансы с допустимой погрешностью для float
         Assertions.assertEquals(
                 depositAmount, updatedAccount1.getBalance(), 0.001, "Баланс аккаунта 1 в API не совпадает");

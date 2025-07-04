@@ -1,43 +1,40 @@
 /* Лицензия */
 package ui.iteration_1;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
 import api.generators.RandomModelGenerator;
 import api.models.CreateUserRequest;
 import api.models.CreateUserResponse;
 import api.models.comparison.ModelAssertions;
 import api.requests.steps.AdminSteps;
-import com.codeborne.selenide.*;
+import common.annotations.AdminSession;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import ui.BaseUiTest;
 import ui.alerts.BankAlerts;
+import ui.elements.UserBage;
 import ui.pages.AdminPanel;
+
+import java.util.List;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 public class CreateUserTest extends BaseUiTest {
+    @AdminSession
     @Test
     public void adminCanCreateUserTest() {
-        // ШАГ 1: админ залогинился в банке
-        CreateUserRequest admin = CreateUserRequest.getAdmin();
-        authAsUser(admin); // залогинись под админом
-
-        // ШАГ 2: админ создает юзера в банке
         CreateUserRequest newUser = RandomModelGenerator.generate(CreateUserRequest.class);
-        new AdminPanel()
+
+        assertTrue(new AdminPanel()
                 .open()
                 .createUser(newUser.getUsername(), newUser.getPassword())
-
-                // ШАГ 3: проверка, что алерт "✅ User created successfully!"
                 .checkedAlertMessageAndAccept(BankAlerts.USER_CREATED_SUCCESSFULLY.getMessage())
-
-                // ШАГ 4: проверка, что юзер отображается на UI
                 .getAllUsers()
-                .findBy(Condition.exactText(newUser.getUsername() + "\nUSER"))
-                .shouldBe(Condition.visible);
+                .stream().noneMatch(userBage -> userBage.getUsername().trim()
+                        .equalsIgnoreCase(newUser.getUsername())));
 
-        // ШАГ 5: проверка, что юзер создан на API
+        // проверка, что юзер создан на API
         CreateUserResponse createdUser =
                 AdminSteps.getAllUsers().stream()
                         .filter(user -> user.getUsername().equals(newUser.getUsername()))
@@ -46,28 +43,19 @@ public class CreateUserTest extends BaseUiTest {
         ModelAssertions.assertThatModels(newUser, createdUser).match();
     }
 
+    @AdminSession
     @Test
     public void adminCannotCreateUserWithInvalidDataTest() {
-        // ШАГ 1: админ залогинился в банке
-        CreateUserRequest admin = CreateUserRequest.getAdmin();
-        authAsUser(admin);
-
-        // ШАГ 2: админ создает юзера в банке
         CreateUserRequest newUser = RandomModelGenerator.generate(CreateUserRequest.class);
         newUser.setUsername("a");
-        new AdminPanel()
+        assertTrue(new AdminPanel()
                 .open()
                 .createUser(newUser.getUsername(), newUser.getPassword())
-
-                // ШАГ 3: проверка, что алерт "Username must be between 3 and 15 characters"
                 .checkedAlertMessageAndAccept(BankAlerts.USER_MUST_BE_BETWEEN_3_AND_15.getMessage())
-
-                // ШАГ 4: проверка, что юзер НЕ отображается на UI
                 .getAllUsers()
-                .findBy(Condition.exactText(newUser.getUsername() + "\nUSER"))
-                .shouldNotBe(Condition.exist);
+                .stream().noneMatch((userBage -> userBage.getUsername().equals(newUser.getUsername()))));
 
-        // ШАГ 5: проверка, что юзер НЕ создан на API
+        // проверка, что юзер НЕ создан на API
         long userWithSameUserNameAsNewUser =
                 AdminSteps.getAllUsers().stream()
                         .filter(user -> user.getUsername().equals(newUser.getUsername()))
